@@ -25,6 +25,22 @@ fi
 echo "📦 Installing tmux configuration..."
 ln -sf "$PWD/tmux/.tmux.conf" ~/.tmux.conf
 
+# Zsh Plugins
+ZSH_PLUGIN_DIR="$HOME/.zsh_plugins"
+mkdir -p "$ZSH_PLUGIN_DIR"
+
+echo "📦 Installing zsh plugins..."
+
+# zsh-syntax-highlighting
+if [ ! -d "$ZSH_PLUGIN_DIR/zsh-syntax-highlighting" ]; then
+  git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "$ZSH_PLUGIN_DIR/zsh-syntax-highlighting"
+fi
+
+# zsh-autosuggestions
+if [ ! -d "$ZSH_PLUGIN_DIR/zsh-autosuggestions" ]; then
+  git clone https://github.com/zsh-users/zsh-autosuggestions "$ZSH_PLUGIN_DIR/zsh-autosuggestions"
+fi
+
 # Link .zshrc
 ln -sf "$PWD/zsh/.zshrc" ~/.zshrc
 

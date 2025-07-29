@@ -4,7 +4,30 @@ export PATH="$HOME/bin:$PATH"
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
-plugins=(git)
+# Plugins
+ZSH_PLUGINS="$HOME/.zsh_plugins"
+
+# Syntax Highlighting
+source "$ZSH_PLUGINS/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+
+# Autosuggestions
+source "$ZSH_PLUGINS/zsh-autosuggestions/zsh-autosuggestions.zsh"
+
+plugins=(
+  git
+  zsh-syntax-highlighting
+  zsh-autosuggestions
+)
+
+autoload -Uz compinit && compinit
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+
+HISTSIZE=10000
+SAVEHIST=10000
+HISTFILE=~/.zsh_history
+
+bindkey -v
+bindkey '^R' history-incremental-search-backward
 
 # Load bash_profile
 if [ -f ~/.bash_profile ]; then

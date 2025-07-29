@@ -45,3 +45,4 @@ fi
 
 eval "$(oh-my-posh init zsh --config ~/.poshthemes/khoa_theme.omp.json)"
 
+export PATH="$PATH:/opt/nvim-linux-x86_64/bin"

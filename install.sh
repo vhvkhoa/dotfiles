@@ -16,6 +16,10 @@ elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
   # Install Ghostty manually or build from source: https://github.com/mitchellh/ghostty
 fi
 
+wget https://github.com/neovim/neovim/releases/download/stable/nvim-linux-x86_64.tar.gz
+tar xzvf nvim-linux-arm64.tar.gz
+./nvim-linux-x86_64/bin/nvim
+
 # Install NvChad
 if [ ! -d "$HOME/.config/nvim" ]; then
   git clone https://github.com/NvChad/NvChad ~/.config/nvim --depth 1

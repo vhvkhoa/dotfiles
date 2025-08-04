@@ -67,7 +67,10 @@ zstyle ':completion:*' menu select
 if command -v dircolors >/dev/null 2>&1; then
   eval "$(dircolors -b)"
 fi
-zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS} 'ma=1;36'  # match=cyan bold
+zmodload zsh/complist
+zstyle ':completion:*' menu select
+# keep LS_COLORS for file types, but make the CURRENT selection white-on-blue & bold
+zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS} 'ma=48;5;27;38;5;231;1'
 
 # Nice grouping headers
 zstyle ':completion:*' group-name ''
@@ -79,17 +82,3 @@ bindkey -M menuselect 'j' vi-down-line-or-history
 bindkey -M menuselect 'k' vi-up-line-or-history
 bindkey -M menuselect 'l' vi-forward-char
 
-# >>> conda initialize >>>
-# !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/home/khoavo/miniconda3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__conda_setup"
-else
-    if [ -f "/home/khoavo/miniconda3/etc/profile.d/conda.sh" ]; then
-        . "/home/khoavo/miniconda3/etc/profile.d/conda.sh"
-    else
-        export PATH="/home/khoavo/miniconda3/bin:$PATH"
-    fi
-fi
-unset __conda_setup
-# <<< conda initialize <<<

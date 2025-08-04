@@ -29,13 +29,6 @@ HISTFILE=~/.zsh_history
 bindkey -v
 bindkey '^R' history-incremental-search-backward
 
-# Load bash_profile
-if [ -f ~/.bash_profile ]; then
-  . ~/.bash_profile
-elif [ -f ~/.bashrc ]; then
-  . ~/.bashrc
-fi
-
 # Preferred editor for local and remote sessions
 if [[ -n $SSH_CONNECTION ]]; then
   export EDITOR='vim'
@@ -85,3 +78,18 @@ bindkey -M menuselect 'h' vi-backward-char
 bindkey -M menuselect 'j' vi-down-line-or-history
 bindkey -M menuselect 'k' vi-up-line-or-history
 bindkey -M menuselect 'l' vi-forward-char
+
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('/home/khoavo/miniconda3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/home/khoavo/miniconda3/etc/profile.d/conda.sh" ]; then
+        . "/home/khoavo/miniconda3/etc/profile.d/conda.sh"
+    else
+        export PATH="/home/khoavo/miniconda3/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<

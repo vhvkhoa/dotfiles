@@ -76,9 +76,23 @@ sudo rm -rf /opt/nvim
 sudo tar -C /opt -xzf nvim-linux-x86_64.tar.gz
 
 # Install NvChad
-if [ ! -d "$HOME/.config/nvim" ]; then
-  git clone https://github.com/NvChad/starter ~/.config/nvim --depth 1
-  rm ~/.config/nvim/.git -rf
+if [ -d "$PWD/nvim" ]; then
+  echo "📦 Installing Neovim config from repo..."
+  mkdir -p ~/.config
+
+  # backup any existing config
+  if [ -e ~/.config/nvim ] || [ -L ~/.config/nvim ]; then
+    mv ~/.config/nvim ~/.config/nvim.bak.$(date +%s)
+  fi
+
+  # use a symlink (easy to iterate on); switch to cp -R if you prefer a copy
+  ln -sfn "$PWD/nvim" ~/.config/nvim
+else
+  echo "ℹ️ No ./nvim folder in this repo; falling back to NvChad starter"
+  if [ ! -d "$HOME/.config/nvim" ]; then
+    git clone https://github.com/NvChad/starter ~/.config/nvim --depth 1
+    rm -rf ~/.config/nvim/.git
+  fi
 fi
 
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh

@@ -12,7 +12,7 @@ if [ -d "$REPO_ROOT/nvim" ]; then
   if [ -e ~/.config/nvim ] || [ -L ~/.config/nvim ]; then
     mv ~/.config/nvim ~/.config/nvim.bak.$(date +%s)
   fi
-  cp "$REPO_ROOT/nvim" ~/.config/nvim
+  cp -r "$REPO_ROOT/nvim" ~/.config/nvim
 else
   echo "ℹ️ No ./nvim folder; using NvChad starter if absent"
   if [ ! -d "$HOME/.config/nvim" ]; then
@@ -73,7 +73,7 @@ if [ -d "$REPO_ROOT/wezterm" ]; then
   if [ -d "$HOME/.config/wezterm" ] || [ -L "$HOME/.config/wezterm" ]; then
     mv "$HOME/.config/wezterm" "$HOME/.config/wezterm.bak.$(date +%s)"
   fi
-  cp -R "$REPO_ROOT/wezterm" "$HOME/.config/wezterm"
+  cp -r "$REPO_ROOT/wezterm" "$HOME/.config/wezterm"
   echo "✅ WezTerm config installed to ~/.config/wezterm"
 else
   echo "ℹ️ No 'wezterm' folder found in this repo; skipping config copy."

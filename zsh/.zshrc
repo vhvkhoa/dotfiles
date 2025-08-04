@@ -50,3 +50,38 @@ export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
 alias ls='ls --color=auto'
 alias grep='grep --color=auto'
 
+# --- Safer pasting (prevents accidental execution; keeps paste editable) ---
+autoload -Uz bracketed-paste-magic
+zle -N bracketed-paste bracketed-paste-magic
+
+# Ensure Backspace deletes across lines in vi insert mode
+bindkey -M viins '^?' backward-delete-char
+
+# Handy: edit the whole command in $EDITOR (default binding: Ctrl-X Ctrl-E)
+autoload -Uz edit-command-line
+zle -N edit-command-line
+# Optional extra binding
+bindkey -M viins '^[e' edit-command-line   # Alt-e to edit current line
+
+# --- Colorful, interactive completion menu ---
+zmodload zsh/complist
+
+# Use a scrollable, selectable menu on Tab
+zstyle ':completion:*' menu select
+
+# Use LS_COLORS to color completion items (dir/file/etc.) and color matches
+# If dircolors exists, prime LS_COLORS first
+if command -v dircolors >/dev/null 2>&1; then
+  eval "$(dircolors -b)"
+fi
+zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS} 'ma=1;36'  # match=cyan bold
+
+# Nice grouping headers
+zstyle ':completion:*' group-name ''
+zstyle ':completion:*:descriptions' format '%F{8}%d%f'
+
+# Optional: vim-like movement in the completion menu
+bindkey -M menuselect 'h' vi-backward-char
+bindkey -M menuselect 'j' vi-down-line-or-history
+bindkey -M menuselect 'k' vi-up-line-or-history
+bindkey -M menuselect 'l' vi-forward-char

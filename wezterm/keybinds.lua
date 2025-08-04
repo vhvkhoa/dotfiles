@@ -5,23 +5,23 @@ local utils = require("utils")
 
 local function replace_mod(tbl, from_mod, to_mod)
   for _, b in ipairs(tbl) do
-    if b.mods then
-      -- replace ALT wherever it appears in the pipe-separated list 
-      b.mods = b.mods:gsub(from_mod, to_mod)
-    end
+    if b.mods then b.mods = b.mods:gsub(from_mod, to_mod) end
   end
 end
+
+local is_macos = wezterm.target_triple:find("darwin") ~= nil
+local PRIMARY_MOD = is_macos and "SUPER" or "ALT"
 
 ---------------------------------------------------------------
 --- keybinds
 ---------------------------------------------------------------
 M.tmux_keybinds = {
-	{ key = "k", mods = "ALT",      action = act({ SpawnTab = "CurrentPaneDomain" }) },
-	{ key = "j", mods = "ALT",      action = act({ CloseCurrentTab = { confirm = true } }) },
-	{ key = "h", mods = "ALT",      action = act({ ActivateTabRelative = -1 }) },
-	{ key = "l", mods = "ALT",      action = act({ ActivateTabRelative = 1 }) },
-	{ key = "h", mods = "ALT|CTRL", action = act({ MoveTabRelative = -1 }) },
-	{ key = "l", mods = "ALT|CTRL", action = act({ MoveTabRelative = 1 }) },
+	{ key = "t", mods = "ALT",      action = act({ SpawnTab = "CurrentPaneDomain" }) },
+	{ key = "w", mods = "ALT",      action = act({ CloseCurrentTab = { confirm = true } }) },
+	{ key = "[", mods = "ALT|SHIFT",      action = act({ ActivateTabRelative = -1 }) },
+	{ key = "]", mods = "ALT|SHIFT",      action = act({ ActivateTabRelative = 1 }) },
+	{ key = "[", mods = "ALT|SHIFT|CTRL", action = act({ MoveTabRelative = -1 }) },
+	{ key = "]", mods = "ALT|SHIFT|CTRL", action = act({ MoveTabRelative = 1 }) },
 	--{ key = "k", mods = "ALT|CTRL", action = act.ActivateCopyMode },
 	{
 		key = "k",
@@ -40,14 +40,14 @@ M.tmux_keybinds = {
 	{ key = "9",     mods = "ALT",            action = act({ ActivateTab = 8 }) },
 	{ key = "-",     mods = "ALT",            action = act({ SplitVertical = { domain = "CurrentPaneDomain" } }) },
 	{ key = "\\",    mods = "ALT",            action = act({ SplitHorizontal = { domain = "CurrentPaneDomain" } }) },
-	{ key = "h",     mods = "ALT|SHIFT",      action = act({ ActivatePaneDirection = "Left" }) },
-	{ key = "l",     mods = "ALT|SHIFT",      action = act({ ActivatePaneDirection = "Right" }) },
-	{ key = "k",     mods = "ALT|SHIFT",      action = act({ ActivatePaneDirection = "Up" }) },
-	{ key = "j",     mods = "ALT|SHIFT",      action = act({ ActivatePaneDirection = "Down" }) },
-	{ key = "h",     mods = "ALT|SHIFT|CTRL", action = act({ AdjustPaneSize = { "Left", 1 } }) },
-	{ key = "l",     mods = "ALT|SHIFT|CTRL", action = act({ AdjustPaneSize = { "Right", 1 } }) },
-	{ key = "k",     mods = "ALT|SHIFT|CTRL", action = act({ AdjustPaneSize = { "Up", 1 } }) },
-	{ key = "j",     mods = "ALT|SHIFT|CTRL", action = act({ AdjustPaneSize = { "Down", 1 } }) },
+	{ key = "h",     mods = "ALT",            action = act({ ActivatePaneDirection = "Left" }) },
+	{ key = "l",     mods = "ALT",            action = act({ ActivatePaneDirection = "Right" }) },
+	{ key = "k",     mods = "ALT",            action = act({ ActivatePaneDirection = "Up" }) },
+	{ key = "j",     mods = "ALT",            action = act({ ActivatePaneDirection = "Down" }) },
+	{ key = "h",     mods = "ALT|SHIFT", action = act({ AdjustPaneSize = { "Left", 1 } }) },
+	{ key = "l",     mods = "ALT|SHIFT", action = act({ AdjustPaneSize = { "Right", 1 } }) },
+	{ key = "k",     mods = "ALT|SHIFT", action = act({ AdjustPaneSize = { "Up", 1 } }) },
+	{ key = "j",     mods = "ALT|SHIFT", action = act({ AdjustPaneSize = { "Down", 1 } }) },
 	{ key = "Enter", mods = "ALT",            action = "QuickSelect" },
 	{ key = "Enter", mods = "SHIFT",          action = act.SendString("\n") },
 	{ key = "/",     mods = "ALT",            action = act.Search("CurrentSelectionOrEmptyString") },
@@ -309,8 +309,11 @@ M.mouse_bindings = {
 	-- },
 }
 
-replace_mod(M.tmux_keybinds, "ALT", "SUPER")
-replace_mod(M.default_keybinds, "ALT", "SUPER")
+replace_mod(M.tmux_keybinds, "ALT", PRIMARY_MOD)
+replace_mod(M.default_keybinds, "ALT", PRIMARY_MOD)
+for _, list in pairs(M.key_tables) do
+  replace_mod(list, "ALT", PRIMARY_MOD)
+end
 
 return M
 

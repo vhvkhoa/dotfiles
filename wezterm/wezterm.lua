@@ -34,7 +34,7 @@ local function create_ssh_domain_from_ssh_config(ssh_domains)
 			name = host,
 			remote_address = config.hostname .. ":" .. config.port,
 			username = config.user,
-			multiplexing = "None",
+			multiplexing = "WezTerm",
 			assume_shell = "Posix",
 		})
 	end
@@ -124,8 +124,8 @@ local config = {
 	window_padding = {
 		left = 0,
 		right = 0,
-		top = 15,
-		bottom = 0,
+		top = 10,
+		bottom = 10,
 	},
 	use_fancy_tab_bar = false,
 	notification_handling = "SuppressFromFocusedTab",

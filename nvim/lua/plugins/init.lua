@@ -13,16 +13,24 @@ return {
     end,
   },
 
+  {
+      'OscarCreator/rsync.nvim',
+      build = 'make',
+      dependencies = 'nvim-lua/plenary.nvim',
+      config = function()
+          require("rsync").setup()
+      end,
+  },
   -- test new blink
   -- { import = "nvchad.blink.lazyspec" },
 
-  -- {
-  -- 	"nvim-treesitter/nvim-treesitter",
-  -- 	opts = {
-  -- 		ensure_installed = {
-  -- 			"vim", "lua", "vimdoc",
-  --      "html", "css"
-  -- 		},
-  -- 	},
-  -- },
+  {
+   	"nvim-treesitter/nvim-treesitter",
+   	opts = {
+   		ensure_installed = {
+   			"vim", "lua", "vimdoc",
+        "html", "css"
+   		},
+   	},
+  },
 }

@@ -83,7 +83,8 @@ local function update_window_background(window, pane)
 	if overrides.color_scheme == nil then
 		return
 	end
-	if pane:get_user_vars().production == "1" then
+  local uv_ok, uv = pcall(function() return pane and pane:get_user_vars() or {} end)
+  if uv_ok and uv.production == "1" then
 		overrides.color_scheme = "OneHalfDark"
 	end
 	window:set_config_overrides(overrides)
@@ -104,14 +105,15 @@ end
 
 -- selene: allow(unused_variable)
 ---@diagnostic disable-next-line: unused-local
-local function update_ssh_status(window, pane)
-	local text = pane:get_domain_name()
-	if text == "local" then
-		text = ""
-	end
+local function update_ssh_status(pane)
+  if not pane then return {} end
+  local ok, domain = pcall(function() return pane:get_domain_name() end)
+  if not ok or not domain or domain == "local" then
+    return {}
+  end
 	return {
 		{ Attribute = { Italic = true } },
-		{ Text = text .. " " },
+		{ Text = (domain or "") .. " " },
 	}
 end
 
@@ -135,9 +137,15 @@ local function display_copy_mode(window, pane)
 	return { { Attribute = { Italic = false } }, { Text = name or "" } }
 end
 
-wezterm.on("update-right-status", function(window, pane)
+wezterm.on("update-right-status", function(window, _pane)
 	-- local tmux = update_tmux_style_tab(window, pane)
-	local ssh = update_ssh_status(window, pane)
+  local pane = window:active_pane()
+  if not pane then
+    window:set_right_status("")
+    return
+  end
+
+	local ssh = update_ssh_status(pane)
 	local copy_mode = display_copy_mode(window, pane)
 	update_window_background(window, pane)
 	local status = utils.merge_lists(ssh, copy_mode)

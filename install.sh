@@ -21,7 +21,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
   # --- WezTerm (macOS) ---
   if ! brew list --cask wezterm >/dev/null 2>&1; then
     echo "📦 Installing WezTerm (macOS)..."
-    brew install --cask wezterm
+    brew install --cask wezterm-nightly
   else
     echo "✅ WezTerm already installed (macOS)."
   fi
@@ -59,7 +59,7 @@ elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
         fi
       fi
     elif command -v dnf >/dev/null 2>&1; then
-      sudo dnf install -y wezterm || echo "⚠️ Install WezTerm manually for your distro."
+      sudo dnf install -y wezterm@nightly || echo "⚠️ Install WezTerm manually for your distro."
     elif command -v pacman >/dev/null 2>&1; then
       sudo pacman -S --noconfirm wezterm || echo "⚠️ Install WezTerm manually for your distro."
     else
@@ -80,6 +80,8 @@ if [ ! -d "$HOME/.config/nvim" ]; then
   git clone https://github.com/NvChad/starter ~/.config/nvim --depth 1
   rm ~/.config/nvim/.git -rf
 fi
+
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
 # Setup tmux config
 echo "📦 Installing tmux configuration..."

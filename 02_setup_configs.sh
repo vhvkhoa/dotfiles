@@ -28,7 +28,18 @@ fi
 
 # --- tmux ---
 echo "📦 Installing tmux configuration..."
-cp "$REPO_ROOT/tmux/.tmux.conf" ~/.tmux.conf
+if ! cmp -s "$REPO_ROOT/tmux/.tmux.conf" ~/.tmux.conf 2>/dev/null; then
+  cp "$REPO_ROOT/tmux/.tmux.conf" ~/.tmux.conf
+else
+  echo "ℹ️ ~/.tmux.conf already up-to-date."
+fi
+
+## --- .zshrc ---
+if ! cmp -s "$REPO_ROOT/zsh/.zshrc" ~/.zshrc 2>/dev/null; then
+  cp "$REPO_ROOT/zsh/.zshrc" ~/.zshrc
+else
+  echo "ℹ️ ~/.zshrc already up-to-date."
+fi
 
 # --- Zsh plugins ---
 ZSH_PLUGIN_DIR="$HOME/.zsh_plugins"
@@ -38,9 +49,6 @@ echo "📦 Installing zsh plugins..."
   git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "$ZSH_PLUGIN_DIR/zsh-syntax-highlighting"
 [ -d "$ZSH_PLUGIN_DIR/zsh-autosuggestions" ] || \
   git clone https://github.com/zsh-users/zsh-autosuggestions "$ZSH_PLUGIN_DIR/zsh-autosuggestions"
-
-# --- .zshrc ---
-cp "$REPO_ROOT/zsh/.zshrc" ~/.zshrc
 
 # --- Conda: initialize for zsh if present ---
 if command -v conda >/dev/null 2>&1; then

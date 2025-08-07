@@ -40,7 +40,34 @@ eval "$(oh-my-posh init zsh --config ~/.poshthemes/khoa_theme.omp.json)"
 
 export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
 
-alias ls='ls --color=auto'
+alias ls='ls -CF'
+alias ll='ls -lh'               # Long list with human-readable sizes
+alias la='ls -lAh'              # Include hidden files, skip . and ..
+alias lS='ls -lhS'              # Sort by size
+alias lt='ls -lht'              # Sort by modification time, newest first
+alias ltr='ls -lhtr'            # Sort by modification time, oldest first
+alias lsd='ls -l | grep "^d"'   # List only directories
+alias l.='ls -d .*'             # List hidden files/folders only
+alias lf='ls -l | grep "^-" '   # List only regular files
+alias l1='ls -1'                # List one file per line (good for scripting)
+alias lsg='ls | grep'           # Quick grep through filenames
+
+alias g='git'
+alias gs='git status -sb'                # Short status (shows branch + changes)
+alias ga='git add'
+alias gaa='git add .'
+alias gc='git commit -m'
+alias gca='git commit -am'              # Commit with staged & tracked changes
+alias gcm='git commit -m'               # Common pattern
+alias gco='git checkout'
+alias gcb='git checkout -b'             # Create and switch to new branch
+alias gb='git branch'
+alias gd='git diff'
+alias gds='git diff --staged'
+alias gl='git pull'
+alias gp='git push'
+alias gpf='git push --force-with-lease' # Safer force push
+
 alias grep='grep --color=auto'
 
 # --- Safer pasting (prevents accidental execution; keeps paste editable) ---

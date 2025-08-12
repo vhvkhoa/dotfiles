@@ -22,4 +22,22 @@ return {
    		},
    	},
   },
+
+  {
+    "supermaven-inc/supermaven-nvim",
+    config = function()
+      require("supermaven-nvim").setup({
+        -- Optional settings
+        keymaps = {
+          accept_suggestion = "<Tab>",
+          clear_suggestion  = "<C-k>",
+          accept_word       = "<C-j>",
+          next_suggestion   = "<C-l>",
+          prev_suggestion   = "<C-h>",
+        },
+        disable_inline_completion = false,
+        disable_keymaps = false,
+      })
+    end,
+  },
 }

@@ -10,7 +10,19 @@ return {
     "neovim/nvim-lspconfig",
     config = function()
       require "configs.lspconfig"
+      require "configs.lsp_python"
     end,
+  },
+
+  {
+    "williamboman/mason.nvim",
+    opts = {
+      ensure_installed = {
+        "basedpyright",
+        "ruff",
+        "black",
+      }
+    }
   },
 
   {
@@ -18,7 +30,7 @@ return {
    	opts = {
    		ensure_installed = {
    			"vim", "lua", "vimdoc",
-        "html", "css"
+        "html", "css", "python",
    		},
    	},
   },

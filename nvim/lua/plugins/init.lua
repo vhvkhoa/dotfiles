@@ -36,6 +36,44 @@ return {
   },
 
   {
+    "hrsh7th/nvim-cmp",
+    opts = function(_, opts)
+      local cmp = require("cmp")
+      local ok_luasnip, luasnip = pcall(require, "luasnip")
+      local sm = require("supermaven-nvim.completion_preview")
+
+      opts.mapping["<Tab>"] = cmp.mapping(function(fallback)
+        if sm and sm.has_suggestion() then
+          sm.on_accept_suggestion()
+        elseif cmp.visible() then
+          cmp.confirm({ select = true })
+        elseif ok_luasnip and luasnip.expand_or_jumpable() then
+          luasnip.expand_or_jump()
+        else
+          fallback()
+        end
+      end, { "i", "s" })
+
+      opts.mapping["<S-Tab>"] = cmp.mapping(function(fallback)
+        if cmp.visible() then
+          cmp.select_prev_item()
+        elseif ok_luasnip and luasnip.jumpable(-1) then
+          luasnip.jump(-1)
+        else
+          fallback()
+        end
+      end, { "i", "s" })
+
+      -- Optional: Enter just inserts a newline
+      opts.mapping["<CR>"] = cmp.mapping(function(fallback)
+        fallback()
+      end, { "i", "s" })
+
+      return opts
+    end,
+  },
+
+  {
     "supermaven-inc/supermaven-nvim",
     config = function()
       require("supermaven-nvim").setup({

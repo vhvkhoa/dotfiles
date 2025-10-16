@@ -69,27 +69,29 @@ mkdir -p ~/.poshthemes
 cp "$REPO_ROOT/omp/khoa_theme.omp.json" ~/.poshthemes/
 chmod 644 ~/.poshthemes/*.omp.json
 if command -v oh-my-posh >/dev/null 2>&1; then
+  echo "🧩 Setting up Oh My Posh..."
   oh-my-posh font install meslo || true
+  echo "✅ Oh My Posh installed. Add config to ~/.zshrc"
   grep -q 'oh-my-posh init zsh' ~/.zshrc || \
     echo 'eval "$(oh-my-posh init zsh --config ~/.poshthemes/khoa_theme.omp.json)"' >> ~/.zshrc
 fi
 
 # --- WezTerm config copy/link ---
-echo "🧩 Setting up WezTerm configuration..."
-mkdir -p ~/.config
-if [ -d "$REPO_ROOT/wezterm" ]; then
-  if [ -d "$HOME/.config/wezterm" ] || [ -L "$HOME/.config/wezterm" ]; then
-    mv "$HOME/.config/wezterm" "$HOME/.config/wezterm.bak.$(date +%s)"
-  fi
-  cp -r "$REPO_ROOT/wezterm" "$HOME/.config/wezterm"
-  echo "✅ WezTerm config installed to ~/.config/wezterm"
-else
-  echo "ℹ️ No 'wezterm' folder found in this repo; skipping config copy."
-fi
+#echo "🧩 Setting up WezTerm configuration..."
+#mkdir -p ~/.config
+#if [ -d "$REPO_ROOT/wezterm" ]; then
+#  if [ -d "$HOME/.config/wezterm" ] || [ -L "$HOME/.config/wezterm" ]; then
+#    mv "$HOME/.config/wezterm" "$HOME/.config/wezterm.bak.$(date +%s)"
+#  fi
+#  cp -r "$REPO_ROOT/wezterm" "$HOME/.config/wezterm"
+#  echo "✅ WezTerm config installed to ~/.config/wezterm"
+#else
+#  echo "ℹ️ No 'wezterm' folder found in this repo; skipping config copy."
+#fi
 
 # --- Default shell to zsh (optional) ---
-if command -v chsh >/dev/null 2>&1; then
-  chsh -s "$(which zsh)" || true
-fi
-
-echo "✅ Configs applied. Open a new terminal or run 'exec zsh'."
+#if command -v chsh >/dev/null 2>&1; then
+#  chsh -s "$(which zsh)" || true
+#fi
+#
+#echo "✅ Configs applied. Open a new terminal or run 'exec zsh'."

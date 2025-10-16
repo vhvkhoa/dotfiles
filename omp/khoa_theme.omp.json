@@ -61,6 +61,38 @@
           "powerline_symbol": "\ue0b4",
           "template": " {{ .HEAD }}",
           "type": "git"
+        },
+        {
+          "background": "p:blue",
+          "foreground": "p:text",
+          "powerline_symbol": "\ue0b4",
+          "style": "powerline",
+          "template": " ({{ .Venv }})",
+          "type": "python",
+          "properties": {
+            "display_mode": "environment",
+            "fetch_virtual_env": true
+          }
+        }
+      ],
+      "type": "prompt"
+    },
+    {
+      "alignment": "right",
+      "segments": [
+        {
+          "type": "env",
+          "style": "powerline",
+          "powerline_symbol": "\ue0b6",
+          "properties": {
+            "variable": "POSH_VI_MODE"
+          },
+          "background": "p:lavender",
+          "foreground": "p:text",
+          "background_templates": [
+            "{{ if eq .Env.POSH_VI_MODE \"NORMAL\" }}#3cb371{{ else }}#1e90ff{{ end }}"
+          ],
+          "template": " {{ .Env.POSH_VI_MODE }} "
         }
       ],
       "type": "prompt"

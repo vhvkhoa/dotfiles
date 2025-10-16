@@ -35,3 +35,21 @@ require "autocmds"
 vim.schedule(function()
   require "mappings"
 end)
+
+-- Make OSC52 the clipboard provider
+local ok, osc52 = pcall(require, 'vim.ui.clipboard.osc52')  -- in some builds the module path is vim.clipboard.osc52
+if ok and osc52 then
+  vim.g.clipboard = {
+    name = 'osc52',
+    copy = {
+      ['+'] = osc52.copy('+'),
+      ['*'] = osc52.copy('*'),
+    },
+    paste = {
+      ['+'] = osc52.paste('+'),
+      ['*'] = osc52.paste('*'),
+    },
+  }
+  vim.opt.clipboard = 'unnamedplus'
+end
+

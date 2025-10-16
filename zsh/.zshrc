@@ -36,21 +36,46 @@ else
   export EDITOR='nvim'
 fi
 
-eval "$(oh-my-posh init zsh --config ~/.poshthemes/khoa_theme.omp.json)"
+# --- Vi-mode cursor shape indicator ---
+function zle-keymap-select {
+  if [[ $KEYMAP == vicmd ]]; then
+    # block cursor for NORMAL mode
+    echo -ne '\e[2 q'
+  else
+    # beam cursor for INSERT mode
+    echo -ne '\e[6 q'
+  fi
+}
+function zle-line-init { zle -K viins; echo -ne '\e[6 q'; }
+zle -N zle-keymap-select
+zle -N zle-line-init
 
 export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
 
-alias ls='ls -CF'
-alias ll='ls -lh'               # Long list with human-readable sizes
-alias la='ls -lAh'              # Include hidden files, skip . and ..
-alias lS='ls -lhS'              # Sort by size
-alias lt='ls -lht'              # Sort by modification time, newest first
-alias ltr='ls -lhtr'            # Sort by modification time, oldest first
-alias lsd='ls -l | grep "^d"'   # List only directories
-alias l.='ls -d .*'             # List hidden files/folders only
-alias lf='ls -l | grep "^-" '   # List only regular files
-alias l1='ls -1'                # List one file per line (good for scripting)
-alias lsg='ls | grep'           # Quick grep through filenames
+if command -v ls >/dev/null 2>&1; then
+  if ls --color=auto -d . >/dev/null 2>&1; then
+    # GNU coreutils (Linux, Homebrew coreutils 'gls' symlinked as ls)
+    alias ls='ls --color=auto -F'
+  else
+    # BSD ls (macOS): use -G and CLICOLOR/LSCOLORS
+    export CLICOLOR=1
+    # Pleasant BSD palette; tweak to taste
+    export LSCOLORS="Exfxcxdxbxegedabagacad"
+    alias ls='ls -GF'
+  fi
+fi
+
+# Friendly variants
+alias ll='ls -lh'               # long, human sizes
+alias la='ls -lAh'              # include dotfiles, skip . and ..
+alias lS='ls -lhS'              # sort by size
+alias lt='ls -lht'              # sort by mtime (newest first)
+alias ltr='ls -lhtr'            # sort by mtime (oldest first)
+alias lsd='ls -l | grep "^d"'   # only directories
+alias l.='ls -d .*'             # only dotfiles/dirs
+alias lf='ls -l | grep "^-" '   # only regular files
+alias l1='ls -1'                # one per line
+alias lsg='ls | grep'           # quick grep
 
 alias g='git'
 alias gs='git status -sb'                # Short status (shows branch + changes)
@@ -109,3 +134,4 @@ bindkey -M menuselect 'j' vi-down-line-or-history
 bindkey -M menuselect 'k' vi-up-line-or-history
 bindkey -M menuselect 'l' vi-forward-char
 
+eval "$(oh-my-posh init zsh --config ~/.poshthemes/khoa_theme.omp.json)"

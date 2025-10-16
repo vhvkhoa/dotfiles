@@ -86,7 +86,7 @@ local config = {
     "Apple Color Emoji",
     "Noto Color Emoji",
   }),
-	font_size = 15,
+	font_size = 12,
 	-- cell_width = 1.1,
 	-- line_height = 1.1,
 	-- font_rules = {

@@ -1,14 +1,27 @@
 -- lua/configs/lsp_python.lua
 
--- 1) keep NvChad's defaults (this is important for mappings like `gd`)
-require("nvchad.configs.lspconfig").defaults()
+-- ---------- common on_attach ----------
+local function default_on_attach(_, bufnr)
+  local map = function(mode, lhs, rhs)
+    vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, silent = true })
+  end
+  map("n", "gd", vim.lsp.buf.definition)
+  map("n", "gD", vim.lsp.buf.declaration)
+  map("n", "gi", vim.lsp.buf.implementation)
+  map("n", "gr", vim.lsp.buf.references)
+  map("n", "K",  vim.lsp.buf.hover)
+  map("n", "<leader>rn", vim.lsp.buf.rename)
+  map("n", "<leader>ca", vim.lsp.buf.code_action)
+  map("n", "<leader>fm", function() vim.lsp.buf.format({ async = true }) end)
+end
 
--- 2) shared stuff
+-- ---------- capabilities ----------
 local caps = vim.lsp.protocol.make_client_capabilities()
 pcall(function()
   caps = require("cmp_nvim_lsp").default_capabilities(caps)
 end)
 
+-- ---------- root detector ----------
 local function python_root(startpath)
   local dir = startpath or vim.api.nvim_buf_get_name(0)
   local root_file = vim.fs.find(
@@ -18,50 +31,36 @@ local function python_root(startpath)
   return root_file and vim.fs.dirname(root_file) or vim.loop.cwd()
 end
 
--- helper: keep only ERROR from a specific client
-local function only_errors_handler(_, result, ctx, config)
-  if result and result.diagnostics then
-    local filtered = {}
-    for _, d in ipairs(result.diagnostics) do
-      if d.severity == vim.diagnostic.severity.ERROR then
-        table.insert(filtered, d)
-      end
-    end
-    result.diagnostics = filtered
-  end
-  return vim.lsp.diagnostic.on_publish_diagnostics(_, result, ctx, config)
-end
-
--- 3) ruff config
+-- ---------- ruff ----------
 local ruff_cfg = {
   name = "ruff",
   cmd = { "ruff", "server" },
   on_attach = function(client, bufnr)
-    -- nvchad defaults already made the keymaps, so no need to redefine
+    default_on_attach(client, bufnr)
+    -- let basedpyright own hover
     if client.server_capabilities then
       client.server_capabilities.hoverProvider = false
     end
-    client.handlers["textDocument/publishDiagnostics"] = only_errors_handler
   end,
   capabilities = caps,
   init_options = {
     settings = {
+      -- you can change ignores here
       args = { "--ignore", "ANN,F841,E501,F401" },
     },
   },
 }
 
--- 4) basedpyright config (with all the silencing)
+-- ---------- basedpyright (de-noised) ----------
 local basedpyright_cfg = {
   name = "basedpyright",
   cmd = { "basedpyright-langserver", "--stdio" },
-  on_attach = function(client, bufnr)
-    client.handlers["textDocument/publishDiagnostics"] = only_errors_handler
-  end,
+  on_attach = default_on_attach,
   capabilities = caps,
   settings = {
     basedpyright = {
       analysis = {
+        -- light check
         typeCheckingMode = "basic",
         diagnosticMode   = "workspace",
         autoSearchPaths  = true,
@@ -76,63 +75,98 @@ local basedpyright_cfg = {
           reportAttributeAccessIssue = "none",
           reportIndexIssue           = "none",
           reportGeneralTypeIssues    = "none",
-          reportArgumentType         = "none",
-          reportCallIssue            = "none",
-          reportFunctionMemberAccess = "none",
+          reportArgumentType         = "none",  -- "argument type doesn't match" or "no overloads match"
+          reportCallIssue            = "none",  -- for mismatched positional/keyword argument errors
+          reportFunctionMemberAccess = "none",  -- sometimes used for os.path and Path calls
         },
       },
     },
   },
 }
 
--- 5) register with the new API (your Neovim was warning about old one)
-if vim.lsp and type(vim.lsp.config) == "function" then
+-- ---------- register + start ----------
+local HAS_NEW = (vim.lsp and type(vim.lsp.start) == "function")
+
+if HAS_NEW and type(vim.lsp.config) == "function" then
+  -- register configs
   vim.lsp.config("ruff", ruff_cfg)
   vim.lsp.config("basedpyright", basedpyright_cfg)
+
+  -- autostart on python
+  vim.api.nvim_create_autocmd("FileType", {
+    pattern = { "python" },
+    callback = function(args)
+      local bufnr = args.buf
+      local fname = vim.api.nvim_buf_get_name(bufnr)
+      local root  = python_root(fname)
+
+      ruff_cfg.root_dir = root
+      basedpyright_cfg.root_dir = root
+
+      -- avoid duplicates
+      local clients = vim.lsp.get_clients({ bufnr = bufnr })
+      local have_ruff, have_bp = false, false
+      for _, c in ipairs(clients) do
+        if c.name == "ruff" then have_ruff = true end
+        if c.name == "basedpyright" then have_bp = true end
+      end
+
+      if not have_ruff then
+        vim.lsp.start(vim.tbl_extend("force", ruff_cfg, { bufnr = bufnr, root_dir = root }))
+      end
+      if not have_bp then
+        vim.lsp.start(vim.tbl_extend("force", basedpyright_cfg, { bufnr = bufnr, root_dir = root }))
+      end
+    end,
+  })
+else
+  -- older Neovim that doesn't have vim.lsp.config:
+  -- just start the servers manually on FileType without touching nvim-lspconfig
+  vim.api.nvim_create_autocmd("FileType", {
+    pattern = { "python" },
+    callback = function(args)
+      local bufnr = args.buf
+      local fname = vim.api.nvim_buf_get_name(bufnr)
+      local root  = python_root(fname)
+
+      ruff_cfg.root_dir = root
+      basedpyright_cfg.root_dir = root
+
+      local clients = vim.lsp.get_clients({ bufnr = bufnr })
+      local have_ruff, have_bp = false, false
+      for _, c in ipairs(clients) do
+        if c.name == "ruff" then have_ruff = true end
+        if c.name == "basedpyright" then have_bp = true end
+      end
+
+      if not have_ruff then
+        vim.lsp.start(vim.tbl_extend("force", ruff_cfg, { bufnr = bufnr, root_dir = root }))
+      end
+      if not have_bp then
+        vim.lsp.start(vim.tbl_extend("force", basedpyright_cfg, { bufnr = bufnr, root_dir = root }))
+      end
+    end,
+  })
 end
 
--- 6) let NvChad actually START them
--- this is the part you were missing when `gd` became dumb
-vim.lsp.enable({
-  "ruff",
-  "basedpyright",
-})
-
--- 7) optional: tighten root dir per buffer
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = "python",
-  callback = function(args)
-    local bufnr = args.buf
-    local fname = vim.api.nvim_buf_get_name(bufnr)
-    local root  = python_root(fname)
-
-    -- update root for these servers
-    for _, name in ipairs({ "ruff", "basedpyright" }) do
-      local clients = vim.lsp.get_clients({ name = name, bufnr = bufnr })
-      for _, c in ipairs(clients) do
-        -- some versions let you set workspace folders; simplest is to leave it
-        -- or just rely on root detection above
+-- ---------- last-resort diagnostic filter ----------
+-- in case some other plugin or rogue LSP still pushes those messages
+do
+  local orig_set = vim.diagnostic.set
+  vim.diagnostic.set = function(namespace, bufnr, diags, opts)
+    if diags and #diags > 0 then
+      local filtered = {}
+      for _, d in ipairs(diags) do
+        local msg = d.message or ""
+        -- kill the pyright-style unknown spam
+        if not msg:match("Argument of type 'Unknown'") and
+           not msg:match("cannot be assigned to parameter") then
+          table.insert(filtered, d)
+        end
       end
+      diags = filtered
     end
-  end,
-})
-
--- 8) last-resort filter for stubborn diagnostics
-local orig_set = vim.diagnostic.set
-vim.diagnostic.set = function(ns, bufnr, diags, opts)
-  if diags and #diags > 0 then
-    local filtered = {}
-    for _, d in ipairs(diags) do
-      local m = d.message or ""
-      if not m:match("Argument of type 'Unknown'") and
-         not m:match("no overloads for .* match the provided arguments") and
-         not m:match("cannot be assigned to parameter")
-      then
-        table.insert(filtered, d)
-      end
-    end
-    diags = filtered
+    return orig_set(namespace, bufnr, diags, opts)
   end
-  return orig_set(ns, bufnr, diags, opts)
 end
 

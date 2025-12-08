@@ -12,9 +12,8 @@ has_sudo() {
 if [[ "$OSTYPE" == "darwin"* ]]; then
   echo "🍎 Detected macOS"
 
-  # oh-my-posh
-  brew list jandedobbeleer/oh-my-posh/oh-my-posh >/dev/null 2>&1 || \
-    brew install jandedobbeleer/oh-my-posh/oh-my-posh
+  # Starship prompt
+  brew list starship >/dev/null 2>&1 || brew install starship
 
   # Ghostty (optional)
   brew list --cask ghostty >/dev/null 2>&1 || brew install --cask ghostty
@@ -42,9 +41,9 @@ elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
     echo "ℹ️ No sudo; skipping apt base packages."
   fi
 
-  # oh-my-posh
-  if ! command -v oh-my-posh >/dev/null 2>&1; then
-    curl -s https://ohmyposh.dev/install.sh | bash -s
+  # Starship prompt (installs to ~/.local/bin by default)
+  if ! command -v starship >/dev/null 2>&1; then
+    curl -sS https://starship.rs/install.sh | sh -s -- -y
   fi
 
   # WezTerm (try distro pkg; fallback to .deb)

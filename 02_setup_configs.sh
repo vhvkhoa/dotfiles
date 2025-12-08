@@ -64,16 +64,17 @@ else
   echo "ℹ️ conda not found; skipping conda init."
 fi
 
-# --- oh-my-posh theme + init ---
-mkdir -p ~/.poshthemes
-cp "$REPO_ROOT/omp/khoa_theme.omp.json" ~/.poshthemes/
-chmod 644 ~/.poshthemes/*.omp.json
-if command -v oh-my-posh >/dev/null 2>&1; then
-  echo "🧩 Setting up Oh My Posh..."
-  oh-my-posh font install meslo || true
-  echo "✅ Oh My Posh installed. Add config to ~/.zshrc"
-  grep -q 'oh-my-posh init zsh' ~/.zshrc || \
-    echo 'eval "$(oh-my-posh init zsh --config ~/.poshthemes/khoa_theme.omp.json)"' >> ~/.zshrc
+# --- Starship prompt ---
+mkdir -p ~/.config
+if [ -f "$REPO_ROOT/starship/starship.toml" ]; then
+  cp "$REPO_ROOT/starship/starship.toml" ~/.config/starship.toml
+fi
+
+if command -v starship >/dev/null 2>&1; then
+  echo "🧩 Setting up Starship prompt..."
+  grep -q 'starship init zsh' ~/.zshrc || echo 'eval "$(starship init zsh)"' >> ~/.zshrc
+else
+  echo "ℹ️ Starship not installed; prompt setup skipped."
 fi
 
 # --- WezTerm config copy/link ---

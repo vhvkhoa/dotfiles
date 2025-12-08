@@ -1,5 +1,5 @@
 export TERM="xterm-256color"
-export PATH="$HOME/bin:$PATH"
+export PATH="$HOME/bin:$HOME/.local/bin:$PATH"
 
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
@@ -134,4 +134,4 @@ bindkey -M menuselect 'j' vi-down-line-or-history
 bindkey -M menuselect 'k' vi-up-line-or-history
 bindkey -M menuselect 'l' vi-forward-char
 
-eval "$(oh-my-posh init zsh --config ~/.poshthemes/khoa_theme.omp.json)"
+eval "$(starship init zsh)"

@@ -9,6 +9,38 @@ has_sudo() {
   return 1
 }
 
+install_tpm() {
+  if ! command -v tmux >/dev/null 2>&1; then
+    echo "ℹ️ tmux not installed; skipping tpm install."
+    return
+  fi
+  if ! command -v git >/dev/null 2>&1; then
+    echo "⚠️ git not found; cannot install tpm."
+    return
+  fi
+
+  local tpm_dir="$HOME/.tmux/plugins/tpm"
+  if [ -d "$tpm_dir/.git" ]; then
+    echo "ℹ️ tmux plugin manager already installed."
+    return
+  fi
+
+  echo "📦 Installing tmux plugin manager (tpm)..."
+  git clone https://github.com/tmux-plugins/tpm "$tpm_dir"
+}
+
+install_tmux_plugins() {
+  local tpm_dir="$HOME/.tmux/plugins/tpm"
+  if [ ! -x "$tpm_dir/bin/install_plugins" ]; then
+    echo "ℹ️ tpm not found; skipping tmux plugin install."
+    return
+  fi
+
+  echo "📦 Installing tmux plugins via tpm..."
+  TMUX_PLUGIN_MANAGER_PATH="$HOME/.tmux/plugins" "$tpm_dir/bin/install_plugins" || \
+    echo "⚠️ tmux plugin install failed; try inside tmux with prefix + I."
+}
+
 if [[ "$OSTYPE" == "darwin"* ]]; then
   echo "🍎 Detected macOS"
 
@@ -16,15 +48,21 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
   brew list jandedobbeleer/oh-my-posh/oh-my-posh >/dev/null 2>&1 || \
     brew install jandedobbeleer/oh-my-posh/oh-my-posh
 
+  # tmux (needed for TPM)
+  brew list tmux >/dev/null 2>&1 || brew install tmux
+
   # Ghostty (optional)
   brew list --cask ghostty >/dev/null 2>&1 || brew install --cask ghostty
 
-  # WezTerm (nightly to match your previous script)
-  if ! brew list --cask wezterm-nightly >/dev/null 2>&1; then
-    echo "📦 Installing WezTerm nightly (macOS)..."
-    brew install --cask wezterm-nightly
-  else
+  # WezTerm (nightly cask name changed to wezterm@nightly; fall back to stable)
+  if brew list --cask wezterm@nightly >/dev/null 2>&1; then
     echo "✅ WezTerm nightly already installed."
+  elif brew info --cask wezterm@nightly >/dev/null 2>&1; then
+    echo "📦 Installing WezTerm nightly (macOS)..."
+    brew install --cask wezterm@nightly
+  else
+    echo "ℹ️ Nightly cask not found; installing stable WezTerm instead."
+    brew list --cask wezterm >/dev/null 2>&1 || brew install --cask wezterm
   fi
 
   # Rust (install only if missing)
@@ -33,11 +71,14 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
   fi
 
+  install_tpm
+  install_tmux_plugins
+
 elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
   echo "🐧 Detected Linux"
 
   if has_sudo; then
-    sudo apt update && sudo apt install -y zsh git curl wget unzip
+    sudo apt update && sudo apt install -y zsh git curl wget unzip tmux
   else
     echo "ℹ️ No sudo; skipping apt base packages."
   fi
@@ -97,6 +138,9 @@ elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
     echo "📦 Installing rustup..."
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
   fi
+
+  install_tpm
+  install_tmux_plugins
 else
   echo "⚠️ Unsupported OS: $OSTYPE"
 fi

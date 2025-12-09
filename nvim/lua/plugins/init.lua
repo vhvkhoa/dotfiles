@@ -43,6 +43,16 @@ return {
       local sm = require("supermaven-nvim.completion_preview")
 
       opts.mapping["<Tab>"] = cmp.mapping(function(fallback)
+        if cmp.visible() then
+          cmp.confirm({ select = true })
+        elseif ok_luasnip and luasnip.expand_or_jumpable() then
+          luasnip.expand_or_jump()
+        else
+          fallback()
+        end
+      end, { "i", "s" })
+
+      opts.mapping["<C-]>"] = cmp.mapping(function(fallback)
         if sm and sm.has_suggestion() then
           sm.on_accept_suggestion()
         elseif cmp.visible() then
@@ -79,7 +89,7 @@ return {
       require("supermaven-nvim").setup({
         -- Optional settings
         keymaps = {
-          accept_suggestion = "<Tab>",
+          accept_suggestion = "<C-]>",
           clear_suggestion  = "<C-k>",
           accept_word       = "<C-j>",
           next_suggestion   = "<C-l>",

@@ -57,6 +57,8 @@ M.default_keybinds = {
 	{ key = "c",         mods = "CTRL|SHIFT", action = act({ CopyTo = "Clipboard" }) },
 	{ key = "v",         mods = "CTRL|SHIFT", action = act({ PasteFrom = "Clipboard" }) },
 	{ key = "Insert",    mods = "SHIFT",      action = act({ PasteFrom = "PrimarySelection" }) },
+	-- Send distinct Ctrl+Enter (CSI-u 13;5u) so Neovim sees <C-CR>
+	{ key = "Enter",     mods = "CTRL",       action = act.SendString("\x1b[13;5u") },
 	{ key = "=",         mods = "CTRL",       action = "ResetFontSize" },
 	{ key = "+",         mods = "CTRL|SHIFT", action = "IncreaseFontSize" },
 	{ key = 'UpArrow',   mods = 'SHIFT',      action = act.ScrollToPrompt(-1) },
@@ -316,4 +318,3 @@ for _, list in pairs(M.key_tables) do
 end
 
 return M
-

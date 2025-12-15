@@ -134,4 +134,4 @@ bindkey -M menuselect 'j' vi-down-line-or-history
 bindkey -M menuselect 'k' vi-up-line-or-history
 bindkey -M menuselect 'l' vi-forward-char
 
-eval "$(oh-my-posh init zsh --config ~/.poshthemes/khoa_theme.omp.json)"
+eval "$(oh-my-posh init zsh --config ~/.poshthemes/khoa_theme.omp.yaml)"

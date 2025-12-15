@@ -66,14 +66,14 @@ fi
 
 # --- oh-my-posh theme + init ---
 mkdir -p ~/.poshthemes
-cp "$REPO_ROOT/omp/khoa_theme.omp.json" ~/.poshthemes/
-chmod 644 ~/.poshthemes/*.omp.json
+cp "$REPO_ROOT/omp/khoa_theme.omp.yaml" ~/.poshthemes/
+chmod 644 ~/.poshthemes/*.omp.*
 if command -v oh-my-posh >/dev/null 2>&1; then
   echo "🧩 Setting up Oh My Posh..."
   oh-my-posh font install meslo || true
   echo "✅ Oh My Posh installed. Add config to ~/.zshrc"
   grep -q 'oh-my-posh init zsh' ~/.zshrc || \
-    echo 'eval "$(oh-my-posh init zsh --config ~/.poshthemes/khoa_theme.omp.json)"' >> ~/.zshrc
+    echo 'eval "$(oh-my-posh init zsh --config ~/.poshthemes/khoa_theme.omp.yaml)"' >> ~/.zshrc
 fi
 
 # --- WezTerm config copy/link ---

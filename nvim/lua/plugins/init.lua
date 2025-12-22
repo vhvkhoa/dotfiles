@@ -100,4 +100,32 @@ return {
       })
     end,
   },
+
+  {
+    "lewis6991/gitsigns.nvim",
+    opts = function()
+      local opts = require "nvchad.configs.gitsigns"
+      local default_attach = opts.on_attach
+
+      opts.on_attach = function(bufnr)
+        if default_attach then
+          default_attach(bufnr)
+        end
+
+        local gs = package.loaded.gitsigns
+        local map = function(mode, lhs, rhs, desc)
+          vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, desc = desc })
+        end
+
+        map("n", "]h", gs.next_hunk, "Next hunk")
+        map("n", "[h", gs.prev_hunk, "Prev hunk")
+        map({ "n", "v" }, "<leader>hs", ":Gitsigns stage_hunk<CR>", "Stage hunk")
+        map("n", "<leader>hp", gs.preview_hunk, "Preview hunk")
+        map("n", "<leader>hr", gs.reset_hunk, "Reset hunk")
+        map("n", "<leader>hu", gs.undo_stage_hunk, "Unstage hunk")
+      end
+
+      return opts
+    end,
+  },
 }
